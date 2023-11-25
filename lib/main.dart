@@ -40,7 +40,8 @@ class _GamePageState extends State {
     'images/d6.png',
   ];
 
-  int index1 = 0, index2 = 0;int diceSum = 0, target = 0;
+  int index1 = 0, index2 = 0;int diceSum = 0,  target = 0;
+  bool shouldShowBoard = false;
   final random = Random.secure();
   String result = '';
   @override
@@ -51,7 +52,8 @@ class _GamePageState extends State {
       ),
       body: Center(
 
-        child: Column(
+        child: shouldShowBoard ?
+        Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
               Row(
@@ -69,7 +71,7 @@ class _GamePageState extends State {
             ElevatedButton(onPressed: () => rollTheDice(), child: const Text('ROLL')),
             ElevatedButton(onPressed: () => reset(), child: const Text('RESET'))
           ],
-        ),
+        ) : CoverPage(onStart: StartGame,),
       ),
     );
   }
@@ -106,6 +108,8 @@ class _GamePageState extends State {
       diceSum = 0;
       target = 0;
       result = '';
+      shouldShowBoard = false;
+
     });
   }
 
@@ -115,6 +119,86 @@ class _GamePageState extends State {
     }else if(diceSum == 7){
       result = 'You lost';
     }
+  }
+
+
+  void StartGame() {
+    setState(() {
+      shouldShowBoard = true;
+    });
+  }
+}
+
+
+
+class CoverPage extends StatelessWidget {
+  final VoidCallback onStart;
+
+  const CoverPage({super.key, required this.onStart});
+
+  @override
+  Widget build(BuildContext context) {
+    return
+      Center(
+        child: Column(
+          children: [
+            Image.asset('images/dicelogo.png', width: 200, height: 200),
+            RichText(text: TextSpan(
+              text: 'MEGA',
+              style: GoogleFonts.russoOne().copyWith(
+                color: Colors.red,
+                fontSize: 40,
+              ),
+            ),
+            ),
+
+            const Spacer(),
+            DiceButton(label: 'START', onPressed: onStart,),
+            SizedBox(width: double.infinity, height: 10,),
+            DiceButton(label: 'HOW TO PLAY', onPressed: () => showInstruction(context),),
+            SizedBox(width: double.infinity, height: 10,),
+          ],
+        ),
+      );
+  }
+}
+
+
+
+showInstruction(BuildContext context) {
+  showDialog(context: context, builder: (context) => const AlertDialog(
+    title: Text('INSTRUCTION'),
+    content: Text(gameRules),
+    actions: [
+      TextButton(
+          onPressed:null,
+          child: Text('CLOSE')
+      )
+    ],
+
+  ));
+}
+
+
+
+class DiceButton extends StatelessWidget {
+  const DiceButton({super.key, required this.label, required this.onPressed});
+  @override
+  final String label;
+  final VoidCallback onPressed;
+
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 200,
+      height: 60,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        child: Text(label,style: const TextStyle(fontSize: 20,color: Colors.white),),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+        ),
+      ),
+    );
   }
 }
 
